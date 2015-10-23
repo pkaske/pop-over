@@ -13,6 +13,8 @@
 
       .toggle {
         cursor: pointer;
+
+        @apply(--pop-over-toggle);
       }
 
       #content {
@@ -23,6 +25,8 @@
         transform: scale(0.90);
         will-change: transform, opacity;
         opacity: 0;
+
+        @apply(--pop-over-content);
       }
 
       #content[open] {
@@ -30,9 +34,10 @@
         transform: scale(1);
         opacity: 1;
         border-radius: 2px;
-        position: absolute;
         background: var(--bg-50);
         @apply(--shadow-elevation-2dp);
+
+        @apply(--pop-over-content-open);
       }
     </style>
 
