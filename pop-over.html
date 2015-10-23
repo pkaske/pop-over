@@ -1,0 +1,141 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/shadow.html">
+
+<dom-module id="pop-over">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        outline: 0;
+      }
+
+      .toggle {
+        cursor: pointer;
+      }
+
+      #content {
+        position: absolute;
+        display: inline-block;
+        transition: transform 0s, opacity 0s;
+        transform: scale(0.90);
+        will-change: transform, opacity;
+        opacity: 0;
+      }
+
+      #content[open] {
+        transition: transform 80ms, opacity 180ms;
+        transform: scale(1);
+        opacity: 1;
+        border-radius: 2px;
+        position: absolute;
+        background: var(--bg-50);
+        @apply(--shadow-elevation-2dp);
+      }
+    </style>
+
+    <div class="wrap">
+      <div class="toggle">
+        <content select="[toggle]"></content>
+      </div>
+      <div id="content" open$="[[isOpen]]">
+        <content select="[content]"></content>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'pop-over',
+
+      properties: {
+        isOpen: {
+          type: Boolean,
+          value: false
+        },
+
+        alwaysToggle: {
+          type: Boolean,
+          value: false
+        },
+
+        _onDocClickHandler: {
+          type: Object,
+          value: function() {
+            return this.close.bind(this);
+          }
+        }
+      },
+
+      hostAttributes: {
+        'tabindex': '0'
+      },
+
+      listeners: {
+        'click': '_onClick',
+        'keydown': '_onKeyDown'
+      },
+
+      detached: function() {
+        document.removeEventListener('click', this._onDocClickHandler, true);
+      },
+
+      close: function() {
+        if (this.isOpen) {
+          this._closeJob = this.async(function() {
+            this.isOpen = false;
+            document.removeEventListener('click', this._onDocClickHandler, true);
+          }, 50);
+        }
+      },
+
+      open: function() {
+        this.isOpen = true;
+        this.$.content.focus();
+        document.addEventListener('click', this._onDocClickHandler, true);
+      },
+
+      toggle: function() {
+        if (!this.isOpen) {
+          this.open();
+        } else {
+          this.isOpen = false;
+          document.removeEventListener('click', this._onDocClickHandler, true);
+        }
+      },
+
+      _onClick: function(e) {
+        e.preventDefault();
+        var t = Polymer.dom(e).rootTarget;
+        var isToggle = this._closest(t, '[toggle]');
+        if (!isToggle && !this.alwaysToggle && this._closest(Polymer.dom(e).rootTarget, '[close-pop-over]') === undefined) {
+          // We didn't click a item, so cancel the global close trigger.
+          this.cancelAsync(this._closeJob);
+          return;
+        }
+
+        this.toggle();
+      },
+
+      _onKeyDown: function(e) {
+        e = Polymer.dom(e);
+        switch(e.event.keyCode) {
+          case 13:
+            this.toggle();
+            break;
+        }
+      },
+
+      _closest: function(node, selector) {
+        var matches = node.matches || node.msMatchesSelector || node.oMatchesSelector;
+
+        while (node) {
+          if (matches.call(node, selector)) {
+            return node;
+          }
+          node = node.parentElement;
+        }
+      },
+    });
+  </script>
+</dom-module>

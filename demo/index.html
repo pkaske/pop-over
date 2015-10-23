@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>&lt;pop-over&gt;</title>
+  <script>
+    // Polymer = {dom: 'shadow'};
+  </script>
+  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="../pop-over.html">
+
+  <style is="custom-style">
+    [content] {
+      width: 400px;
+    }
+
+    [close-pop-over] {
+      margin-top: 20px;
+      color: rgb(252, 100, 59);
+    }
+
+    pop-over:focus [toggle] {
+      border: solid 1px rgb(252, 100, 59);
+    }
+  </style>
+</head>
+
+<body>
+  <pop-over>
+    <div toggle>I'm the toggle</div>
+    <div content>
+      <span>Hello there!</span>
+      <div close-pop-over>Click me to close the popover</div>
+    </div>
+  </pop-over>
+</body>
+
+</html>
