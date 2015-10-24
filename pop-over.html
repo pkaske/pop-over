@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/shadow.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 
 <dom-module id="pop-over">
   <template>
@@ -7,7 +8,6 @@
       :host {
         display: inline-block;
         position: relative;
-        cursor: pointer;
         outline: 0;
       }
 
@@ -19,14 +19,14 @@
 
       #content {
         position: absolute;
+        left: 0;
+        margin-top: var(--pop-over-spacing, 24px);
         z-index: 1;
         display: inline-block;
         transition: transform 0s, opacity 0s;
         transform: scale(0.90);
         will-change: transform, opacity;
         opacity: 0;
-
-        @apply(--pop-over-content);
       }
 
       #content[open] {
@@ -36,17 +36,36 @@
         border-radius: 2px;
         background: var(--bg-50);
         @apply(--shadow-elevation-2dp);
+      }
 
+      #content .content-wrap {
+        @apply(--pop-over-content);
+      }
+
+      #content[open] {
         @apply(--pop-over-content-open);
+      }
+
+      .top-arrow {
+        position: absolute;
+        top: -20px;
+        width: 100%;
+
+        @apply(--pop-over-icon);
+        --iron-icon-width: var(--pop-over-icon-size, 32px);
+        --iron-icon-height: var(--pop-over-icon-size, 32px);
       }
     </style>
 
     <div class="wrap">
       <div class="toggle">
-        <content select="[toggle]"></content>
+        <content id="toggleContent" select="[toggle]"></content>
       </div>
       <div id="content" open$="[[isOpen]]">
-        <content select="[content]"></content>
+        <iron-icon class="top-arrow" icon="[[topArrow]]"></iron-icon>
+        <div class="content-wrap">
+          <content select="[content]"></content>
+        </div>
       </div>
     </div>
   </template>
@@ -55,14 +74,28 @@
       is: 'pop-over',
 
       properties: {
+        /**
+         * Indicates if the pop-over is currently open.
+         */
         isOpen: {
+          type: Boolean,
+          value: false,
+          readOnly: true
+        },
+
+        /**
+         * Every click inside the popup content closes the pop-over if true.
+         */
+        alwaysToggle: {
           type: Boolean,
           value: false
         },
 
-        alwaysToggle: {
-          type: Boolean,
-          value: false
+        /**
+         * Icon that can be used to show a arrow at the top of the popup content.
+         */
+        topArrow: {
+          type: String
         },
 
         _onDocClickHandler: {
@@ -71,6 +104,13 @@
             return this.close.bind(this);
           }
         }
+      },
+
+      get toggleEl() {
+        if (!this._toggleEl) {
+          this._toggleEl = this.getContentChildren('#toggleContent')[0];
+        }
+        return this._toggleEl;
       },
 
       hostAttributes: {
@@ -89,15 +129,17 @@
       close: function() {
         if (this.isOpen) {
           this._closeJob = this.async(function() {
-            this.isOpen = false;
+            this._setIsOpen(false);
             document.removeEventListener('click', this._onDocClickHandler, true);
           }, 50);
         }
       },
 
       open: function() {
-        this.isOpen = true;
-        this.$.content.focus();
+        this._setIsOpen(true);
+        var contentWidth = this.$.content.offsetWidth;
+        var toggleWidth = this.toggleEl.offsetWidth;
+        this.$.content.style.marginLeft = (-1 * ((contentWidth / 2) - toggleWidth / 2)) + 'px';
         document.addEventListener('click', this._onDocClickHandler, true);
       },
 
@@ -105,7 +147,7 @@
         if (!this.isOpen) {
           this.open();
         } else {
-          this.isOpen = false;
+          this._setIsOpen(false);
           document.removeEventListener('click', this._onDocClickHandler, true);
         }
       },
