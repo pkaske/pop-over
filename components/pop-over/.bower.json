@@ -1,0 +1,36 @@
+{
+  "name": "pop-over",
+  "description": "Simple Popover web component. Build with Polymer 1.0.",
+  "license": "MIT",
+  "main": "pop-over.html",
+  "keywords": [
+    "polymer",
+    "web-components",
+    "calendar"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
+    "iron-icon": "PolymerElements/iron-icon#^1.0.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.0.0"
+  },
+  "homepage": "https://github.com/pkaske/pop-over",
+  "_release": "f0dcce5000",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "f0dcce50000fad93ccff275a37ed63644b502b15"
+  },
+  "_source": "git://github.com/pkaske/pop-over.git",
+  "_target": "master",
+  "_originalSource": "pkaske/pop-over",
+  "_direct": true
+}

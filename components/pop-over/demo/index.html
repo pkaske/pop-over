@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>&lt;pop-over&gt;</title>
+  <script>
+    // Polymer = {dom: 'shadow'};
+  </script>
+  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="../../iron-iconset-svg/iron-iconset-svg.html">
+  <link rel="import" href="../pop-over.html">
+
+  <style is="custom-style">
+    [content] {
+      width: 400px;
+    }
+
+    [close-pop-over] {
+      margin-top: 20px;
+      color: rgb(252, 100, 59);
+    }
+
+    pop-over {
+      position: absolute;
+      left: 30%;
+      top: 40%;
+
+      --pop-over-content: {
+        background: #303030;
+        color: #fff;
+        padding: 10px;
+      };
+
+      --pop-over-icon: {
+        fill: #303030;
+      };
+    }
+
+    pop-over:focus [toggle] {
+      border: solid 1px rgb(252, 100, 59);
+    }
+  </style>
+</head>
+
+<body>
+  <iron-iconset-svg name="pop-over-icons" size="24">
+    <svg>
+      <defs>
+        <g id="menu-up">
+          <path d="M7,15L12,10L17,15H7Z" />
+        </g>
+      </defs>
+    </svg>
+  </iron-iconset-svg>
+
+  <pop-over top-arrow="pop-over-icons:menu-up">
+    <div toggle>I'm the toggle</div>
+    <div content>
+      <span>Hello there!</span>
+      <div close-pop-over>Click me to close the popover</div>
+    </div>
+  </pop-over>
+</body>
+
+</html>
