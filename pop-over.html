@@ -22,7 +22,7 @@
         left: 0;
         margin-top: var(--pop-over-spacing, 24px);
         z-index: 1;
-        display: inline-block;
+        display: none;
         transition: transform 80ms, opacity 180ms;
         transform: scale(0.90);
         will-change: transform, opacity;
@@ -129,6 +129,12 @@
         if (this.isOpen) {
           this._closeJob = this.async(function() {
             this._setIsOpen(false);
+
+            // Make sure the display property of the content element is set to `none`.
+            // This is important in case the `transitionend` event doesn't fire.
+            this.async(function() {
+      			  this._afterTransition();
+      			}, 250);
             document.removeEventListener('click', this._onDocClickHandler, true);
           }, 50);
         }
