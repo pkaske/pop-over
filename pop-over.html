@@ -23,27 +23,24 @@
         margin-top: var(--pop-over-spacing, 24px);
         z-index: 1;
         display: inline-block;
-        transition: transform 0s, opacity 0s;
+        transition: transform 80ms, opacity 180ms;
         transform: scale(0.90);
         will-change: transform, opacity;
         opacity: 0;
       }
 
       #content[open] {
-        transition: transform 80ms, opacity 180ms;
         transform: scale(1);
         opacity: 1;
         border-radius: 2px;
         background: var(--bg-50);
         @apply(--shadow-elevation-2dp);
+
+        @apply(--pop-over-content-open);
       }
 
       #content .content-wrap {
         @apply(--pop-over-content);
-      }
-
-      #content[open] {
-        @apply(--pop-over-content-open);
       }
 
       .top-arrow {
@@ -120,7 +117,8 @@
 
       listeners: {
         'click': '_onClick',
-        'keydown': '_onKeyDown'
+        'keydown': '_onKeyDown',
+        'content.transitionend': '_afterTransition'
       },
 
       detached: function() {
@@ -137,11 +135,14 @@
       },
 
       open: function() {
-        this._setIsOpen(true);
-        var contentWidth = this.$.content.offsetWidth;
-        var toggleWidth = this.toggleEl.offsetWidth;
-        this.$.content.style.marginLeft = (-1 * ((contentWidth / 2) - toggleWidth / 2)) + 'px';
-        document.addEventListener('click', this._onDocClickHandler, true);
+    		this.$.content.style.display = 'block';
+    	  	this.async(function() {
+    		  this._setIsOpen(true);
+    		  var contentWidth = this.$.content.offsetWidth;
+    		  var toggleWidth = this.toggleEl.offsetWidth;
+    		  this.$.content.style.marginLeft = (-1 * ((contentWidth / 2) - toggleWidth / 2)) + 'px';
+    		  document.addEventListener('click', this._onDocClickHandler, true);
+    		}, 10);
       },
 
       toggle: function() {
@@ -152,6 +153,12 @@
           document.removeEventListener('click', this._onDocClickHandler, true);
         }
       },
+
+	    _afterTransition: function() {
+    		if(!this.isOpen) {
+    		  this.$.content.style.display = 'none';
+    		}
+  	  },
 
       _onClick: function(e) {
         e.preventDefault();
