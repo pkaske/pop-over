@@ -168,7 +168,6 @@
   	  },
 
       _onClick: function(e) {
-        e.preventDefault();
         var target = this._closest(Polymer.dom(e).rootTarget, '[toggle]', true);
 		    var isToggle = target === this.toggleEl;
         if (!isToggle && !this.alwaysToggle && this._closest(Polymer.dom(e).rootTarget, '[close-pop-over]') === undefined) {
