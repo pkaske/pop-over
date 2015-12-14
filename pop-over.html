@@ -169,8 +169,8 @@
 
       _onClick: function(e) {
         e.preventDefault();
-        var t = Polymer.dom(e).rootTarget;
-        var isToggle = this._closest(t, '[toggle]');
+        var target = this._closest(Polymer.dom(e).rootTarget, '[toggle]');
+		    var isToggle = target === this.toggleEl;
         if (!isToggle && !this.alwaysToggle && this._closest(Polymer.dom(e).rootTarget, '[close-pop-over]') === undefined) {
           // We didn't click a item, so cancel the global close trigger.
           this.cancelAsync(this._closeJob);
