@@ -2,6 +2,13 @@
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 
+<!--
+# pop-over
+
+Displays a popup when the toggle is clicked.
+
+@demo
+-->
 <dom-module id="pop-over">
   <template>
     <style>
@@ -170,7 +177,7 @@
       _onClick: function(e) {
         var target = this._closest(Polymer.dom(e).rootTarget, '[toggle]', true);
 		    var isToggle = target === this.toggleEl;
-        if (!isToggle && !this.alwaysToggle && this._closest(Polymer.dom(e).rootTarget, '[close-pop-over]') === undefined) {
+        if (!isToggle && !this.alwaysToggle && this._closest(Polymer.dom(e).rootTarget, '[close-pop-over]', true) === undefined) {
           // We didn't click a item, so cancel the global close trigger.
           this.cancelAsync(this._closeJob);
           return;
