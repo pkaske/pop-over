@@ -175,6 +175,7 @@ Displays a popup when the toggle is clicked.
   	  },
 
       _onClick: function(e) {
+        e.stopPropagation();
         var target = this._closest(Polymer.dom(e).rootTarget, '[toggle]', true);
 		    var isToggle = target === this.toggleEl;
         if (!isToggle && !this.alwaysToggle && this._closest(Polymer.dom(e).rootTarget, '[close-pop-over]', true) === undefined) {
