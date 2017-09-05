@@ -1,7 +1,7 @@
 {
   "name": "pop-over",
-  "version": "1.1.8",
-  "description": "Simple Popover web component. Build with Polymer 1.0.",
+  "version": "2.0.0",
+  "description": "Simple Popover web component. Build with Polymer 2.0.",
   "license": "MIT",
   "main": "pop-over.html",
   "keywords": [
@@ -15,12 +15,17 @@
     "bower_components"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.0.0",
-    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
-    "iron-icon": "PolymerElements/iron-icon#^1.0.0"
+    "polymer": "Polymer/polymer#^2.0.0",
+    "paper-styles": "PolymerElements/paper-styles#^2.0.0",
+    "iron-icon": "PolymerElements/iron-icon#^2.0.1"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.0.0"
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^2.1.0"
+  },
+  "resolutions": {
+    "polymer": "^2.0.0"
   }
 }
