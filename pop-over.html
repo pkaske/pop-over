@@ -1,6 +1,8 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/utils/async.html">
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../shadycss/apply-shim.html">
 
 <!--
 # pop-over
@@ -21,7 +23,7 @@ Displays a popup when the toggle is clicked.
       .toggle {
         cursor: pointer;
 
-        @apply(--pop-over-toggle);
+        @apply --pop-over-toggle;
       }
 
       #content {
@@ -41,14 +43,21 @@ Displays a popup when the toggle is clicked.
         opacity: 1;
         border-radius: 2px;
         background: var(--bg-50);
-        @apply(--shadow-elevation-2dp);
+        @apply --shadow-elevation-2dp;
 
-        @apply(--pop-over-content-open);
+        @apply --pop-over-content-open;
       }
+
 
       #content .content-wrap {
-        @apply(--pop-over-content);
+        @apply --pop-over-content;
       }
+      /*#content ::slotted(*) {*/
+        /*@apply --pop-over-content;*/
+        /*background: #303030;*/
+        /*color: #fff;*/
+        /*padding: 10px;*/
+      /*}*/
 
       .top-arrow {
         position: absolute;
@@ -56,146 +65,146 @@ Displays a popup when the toggle is clicked.
         left: 0;
         width: 100%;
 
-        @apply(--pop-over-icon);
+        @apply --pop-over-icon;
         --iron-icon-width: var(--pop-over-icon-size, 32px);
         --iron-icon-height: var(--pop-over-icon-size, 32px);
       }
     </style>
-
     <div class="wrap">
       <div class="toggle">
-        <content id="toggleContent" select="[toggle]"></content>
+        <slot id="toggleContent" name="toggle"></slot>
       </div>
       <div id="content" open$="[[isOpen]]">
         <iron-icon class="top-arrow" icon="[[topArrow]]"></iron-icon>
         <div class="content-wrap">
-          <content select="[content]"></content>
+          <slot name="content"></slot>
         </div>
       </div>
     </div>
   </template>
   <script>
-    Polymer({
-      is: 'pop-over',
+    class PopOver extends Polymer.Element{
+      static get is() { return 'pop-over'; }
+      static get properties() {
+        return {
+          /**
+           * Indicates if the pop-over is currently open.
+           */
+          isOpen: {
+            type: Boolean,
+            value: false,
+            notify: true,
+            readOnly: true
+          },
 
-      properties: {
-        /**
-         * Indicates if the pop-over is currently open.
-         */
-        isOpen: {
-          type: Boolean,
-          value: false,
-          notify: true,
-          readOnly: true
-        },
+          /**
+           * Every click inside the popup content closes the pop-over if true.
+           */
+          alwaysToggle: {
+            type: Boolean,
+            value: false
+          },
 
-        /**
-         * Every click inside the popup content closes the pop-over if true.
-         */
-        alwaysToggle: {
-          type: Boolean,
-          value: false
-        },
+          /**
+           * Icon that can be used to show a arrow at the top of the popup content.
+           */
+          topArrow: {
+            type: String
+          },
 
-        /**
-         * Icon that can be used to show a arrow at the top of the popup content.
-         */
-        topArrow: {
-          type: String
-        },
-
-        _onDocClickHandler: {
-          type: Object,
-          value: function() {
-            return this.close.bind(this);
+          _onDocClickHandler: {
+            type: Object,
+            value: function() {
+              return this.close.bind(this);
+            }
           }
         }
-      },
+      }
 
       get toggleEl() {
         if (!this._toggleEl) {
-          this._toggleEl = this.getContentChildren('#toggleContent')[0];
+          this._toggleEl = this.shadowRoot.querySelector('#toggleContent').assignedNodes({flatten: true}).filter(function(n) {
+            return (n.nodeType === Node.ELEMENT_NODE);
+          });
         }
-        return this._toggleEl;
-      },
+        return this._toggleEl[0];
+      }
 
-      hostAttributes: {
-        'tabindex': '0'
-      },
+      ready() {
+        super.ready();
+        this._ensureAttribute('tabindex', 0);
+        this.addEventListener('click', e => this._onClick(e));
+        this.addEventListener('keydown', e => this._onKeyDown(e));
+      }
 
-      listeners: {
-        'click': '_onClick',
-        'keydown': '_onKeyDown',
-        'content.transitionend': '_afterTransition'
-      },
-
-      detached: function() {
+      disconnectedCallback () {
         document.removeEventListener('click', this._onDocClickHandler, true);
-      },
+      }
 
-      close: function() {
+      close() {
         if (this.isOpen) {
-          this._closeJob = this.async(function() {
+          var async = Polymer.Async.timeOut.after(50);
+          this._closeJob = async.run(() => {
             this._setIsOpen(false);
-
-            // Make sure the display property of the content element is set to `none`.
-            // This is important in case the `transitionend` event doesn't fire.
-            this.async(function() {
-      			  this._afterTransition();
-      			}, 250);
+            var async = Polymer.Async.timeOut.after(250);
+            async.run(() => {
+              this._afterTransition();
+            })
             document.removeEventListener('click', this._onDocClickHandler, true);
-          }, 50);
+          })
         }
-      },
+      }
 
-      open: function() {
-    		this.$.content.style.display = 'block';
-    	  	this.async(function() {
-    		  this._setIsOpen(true);
-    		  var contentWidth = this.$.content.offsetWidth;
-    		  var toggleWidth = this.toggleEl.offsetWidth;
-    		  this.$.content.style.marginLeft = (-1 * ((contentWidth / 2) - toggleWidth / 2)) + 'px';
-    		  document.addEventListener('click', this._onDocClickHandler, true);
-    		}, 10);
-      },
+      open() {
+        this.$.content.style.display = 'block';
+        var async = Polymer.Async.timeOut.after(10);
+        async.run(() => {
+          this._setIsOpen(true);
+          var contentWidth = this.$.content.offsetWidth;
+          var toggleWidth = this.toggleEl.offsetWidth;
+          this.$.content.style.marginLeft = (-1 * ((contentWidth / 2) - toggleWidth / 2)) + 'px';
+          document.addEventListener('click', this._onDocClickHandler, true);
+        })
+      }
 
-      toggle: function() {
+      toggle() {
         if (!this.isOpen) {
           this.open();
         } else {
           this._setIsOpen(false);
           document.removeEventListener('click', this._onDocClickHandler, true);
         }
-      },
+      }
 
-	    _afterTransition: function() {
-    		if(!this.isOpen) {
-    		  this.$.content.style.display = 'none';
-    		}
-  	  },
+      _afterTransition() {
+        if(!this.isOpen) {
+          this.$.content.style.display = 'none';
+        }
+      }
 
-      _onClick: function(e) {
-        var target = this._closest(Polymer.dom(e).rootTarget, '[toggle]', true);
-		    var isToggle = target === this.toggleEl;
+      _onClick(e) {
+        var target = this._closest(Polymer.dom(e).rootTarget, '[slot="toggle"]', true);
+        var isToggle = target === this.toggleEl;
         if (!isToggle && !this.alwaysToggle && this._closest(Polymer.dom(e).rootTarget, '[close-pop-over]', true) === undefined) {
           // We didn't click a item, so cancel the global close trigger.
-          this.cancelAsync(this._closeJob);
+//          this.cancelAsync(this._closeJob);
+          Polymer.Async.timeOut.cancel(this._closeJob);
           return;
         }
 
         this.toggle();
-      },
+      }
 
-      _onKeyDown: function(e) {
+      _onKeyDown(e) {
         e = Polymer.dom(e);
         switch(e.event.keyCode) {
           case 13:
             this.toggle();
             break;
         }
-      },
+      }
 
-      _closest: function(node, selector, pierce) {
+      _closest(node, selector, pierce) {
         var matches = node.matches || node.msMatchesSelector || node.oMatchesSelector;
         while (node) {
           if (matches.call(node, selector)) {
@@ -211,6 +220,8 @@ Displays a popup when the toggle is clicked.
           }
         }
       }
-    });
+    }
+
+    window.customElements.define(PopOver.is, PopOver);
   </script>
 </dom-module>
