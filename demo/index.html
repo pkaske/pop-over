@@ -13,9 +13,11 @@
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel="import" href="../../iron-iconset-svg/iron-iconset-svg.html">
   <link rel="import" href="../../shadycss/apply-shim.html">
+  <link rel="import" href="../../polymer/lib/elements/custom-style.html">
   <link rel="import" href="../pop-over.html">
 
-  <style is="custom-style">
+  <custom-style>
+    <style>
     [slot=content] {
       width: 400px;
     }
@@ -44,7 +46,8 @@
     pop-over:focus [toggle] {
       border: solid 1px rgb(252, 100, 59);
     }
-  </style>
+    </style>
+  </custom-style>
 </head>
 
 <body>
